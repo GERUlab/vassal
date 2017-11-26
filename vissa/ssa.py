@@ -6,8 +6,8 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-from tsar.devutil.performance import mytimer
-from tsar.dtypes import is_1darray_like
+from vissa.devutil.performance import mytimer
+from vissa.dtypes import is_1darray_like
 
 try:
     import pandas as pd
@@ -46,7 +46,7 @@ class BasicSsa(object):
     
     Loading time series
     
-    >>> co2 = pd.read_csv("co2.csv", index_col=0, header=None)
+    >>> co2 = pd.read_csv("test/co2.csv", index_col=0, header=None)
     >>> co2 = co2[co2.columns[0]]
     >>> co2.describe()
     count    468.000000
@@ -562,11 +562,5 @@ class BasicSsa(object):
 
 if __name__ == '__main__':
     import doctest
-    import pandas as pd
 
-    co2 = pd.read_csv("co2.csv", index_col=0, header=None)
-    co2 = co2[co2.columns[0]]
-    co2_ssa = BasicSsa(co2)
-    co2_ssa.plot('paired')
-
-    #doctest.testmod()
+    doctest.testmod()

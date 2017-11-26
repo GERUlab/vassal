@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ssa.iml" filepath="$PROJECT_DIR$/.idea/ssa.iml" />
+      <module fileurl="file://C:\Users\dadelforge\Google Drive\MIGRADAKH\07_labo_numerique\modules\vissa\.idea\ssa.iml" filepath="C:\Users\dadelforge\Google Drive\MIGRADAKH\07_labo_numerique\modules\vissa\.idea\ssa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/vissa.iml" filepath="$PROJECT_DIR$/.idea/vissa.iml" />
     </modules>
   </component>
 </project>
