@@ -1,6 +1,6 @@
 # Benchmarking SVD algorithm
 
-## Comparison of SVD algorithm in python
+## SVD algorithms in python
 
 * [`numpy.linalg.svd`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.svd.html)
 
