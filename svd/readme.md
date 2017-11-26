@@ -1,4 +1,4 @@
-# Benchmarking SVD algorithm
+# Benchmarking SVD algorithms
 
 ## SVD algorithms in python
 
@@ -18,7 +18,13 @@ Compute the largest k singular values/vectors for a sparse matrix. This is a nai
 
 This estimator supports two algorithms: a fast randomized SVD solver, and a “naive” algorithm that uses ARPACK as an eigensolver on (X * X.T) or (X.T * X), whichever is more efficient.
 
-## Other SVD algorithms
+## SVD algorithms selection
+
+`nplapack`
+`splapack`
+`sparpack`
+
+
 
 
 
