@@ -12,7 +12,7 @@ Singular Spectrum Analysis (SSA) is a non-parametric and model free method for t
 
 The main hypothesis behind SSA is separability of the components.
 
-### Potential application of SSA?
+### Potential application of SSA
 
 * Smoothing, filtering, noise reduction
 * Structured components extraction (ie. trend or seasonality)
@@ -22,12 +22,13 @@ The main hypothesis behind SSA is separability of the components.
 
 ### Variants of SSA
 
-Different variants of SSA could be declined based either on the embedding method or the decomposition method.
+Different variants of SSA could be declined based either on the embedding method, the decomposition method or the dimensional nature of the dataset of interest.
 
 * **Basic SSA**: The basic 1d SSA algorithm also known as the Broomhead-King variant of SSA (or BK-SSA). The time series is embedded in a Hankel matrix.
 * **Toeplitz SSA**: The Toeplitz variant of SSA also known as Vautard-Ghil variant of SSA (or VG-SSA). The time series is embedded in a Toeplitz matrix. Toeplitz SSA should be used when time series is known to be stationary.
 * **SSA-ICA**: ICA refers to Independent Component Analysis (ICA) and replace SVD. This variants helps to separate components in case of weak separability. As a less stable procedure than SVD, SSA-ICA is best used in a two stages procedure, a first separation is done using a basic SVD method, then remaining mixed-up components are decomposed using SSA-ICA.
 
+Some other variants are not 1-dimensional such as: **Multichannel SSA** (multiple time series), **2d-SSA** (arrays and images), **nd-SSA** (nd arrays).
 
 ## Acknowledgment
 
