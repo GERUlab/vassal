@@ -7,6 +7,17 @@ see: https://stats.stackexchange.com/a/159602/87558
 
 for comparison with rSSA package: https://cran.r-project.org/web/packages/Rssa/Rssa.pdf
 
+References for sklearn TruncatedSVD:   
+
+* Finding structure with randomness: Stochastic algorithms for constructing
+  approximate matrix decompositions
+  Halko, et al., 2009 http://arxiv.org/abs/arXiv:0909.4061
+* A randomized algorithm for the decomposition of matrices
+  Per-Gunnar Martinsson, Vladimir Rokhlin and Mark Tygert
+* An implementation of a randomized algorithm for principal component
+  analysis
+  A. Szlam et al. 2014
+
 ## SVD algorithms in python scientific librairies
 
 * [`numpy.linalg.svd`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.svd.html)
