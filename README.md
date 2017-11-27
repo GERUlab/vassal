@@ -1,4 +1,4 @@
-# A Python implementation of various Singular Spectrum Analysis Algorithms
+# VASSAL: VArious Singular Spectrum AnaLysis with python
 
 Important Note:
 
