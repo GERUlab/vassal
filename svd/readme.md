@@ -21,7 +21,6 @@ memory usage by controlling the maximum basis size.  Another
 similarity is that both can keep an arbitrary number of basis vectors 
 when restarting -- this is the key advantage of these methods over 
 earlier restarted versions.
-
 On symmetric (or Hermitian) problems, when the basis vectors 
 corresponding to the same Ritz values are saved during restarting, 
 TRLan and ARPACK are theoretically equivalent.  One difference is that 
@@ -29,7 +28,6 @@ TRLan uses Ritz vectors while ARPACK uses the vectors produced by the
 implicit QR procedure.  This makes TRLan a little easier to understand 
 and implement.  This difference is mainly useful for software 
 implementors -- it is of no consequence to the end users.
-
 What do have some consequence are the following.  TRLan can take 
 advantage of the symmetry in the original problem as Ichi has pointed 
 out.  TRLan and especially nuTRLan use more advanced strategies to 
