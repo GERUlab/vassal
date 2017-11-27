@@ -20,10 +20,8 @@ This estimator supports two algorithms: a fast randomized SVD solver, and a “n
 
 ## SVD algorithms selection
 
-`nplapack`
-`splapack`
-`sparpack`
-
+The idea is to let the user choose the available implementation he wants to use:
+`nplapack`,`splapack`,`sparpack`,`skarpack` or `skrandom`.
 
 
 
