@@ -1,6 +1,13 @@
 # Benchmarking SVD algorithms
 
-## SVD algorithms in python
+## SVD algorithms
+TODOC
+
+see: https://stats.stackexchange.com/a/159602/87558
+
+for comparison with rSSA package: https://cran.r-project.org/web/packages/Rssa/Rssa.pdf
+
+## SVD algorithms in python scientific librairies
 
 * [`numpy.linalg.svd`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.svd.html)
 
