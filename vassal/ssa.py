@@ -6,8 +6,9 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-from vissa.devutil.performance import mytimer
-from vissa.dtypes import is_1darray_like
+from vassal.devutil.performance import mytimer
+from vassal.dtypes import is_1darray_like
+from vassal.base import BaseSSA
 
 try:
     import pandas as pd
@@ -21,7 +22,9 @@ except:
 # TODO: test behavior with np.nan in series
 # TODO: add option full_matrices
 
-class BasicSsa(object):
+
+
+class BasicSSA(BaseSSA):
     """A class for basic Singular Spectrum Analysis 
     
     Singular Spectrum Analysis (SSA) is a non-parametric method
@@ -61,7 +64,7 @@ class BasicSsa(object):
     
     Decomposition
     
-    >>> co2_ssa = BasicSsa(co2)
+    >>> co2_ssa = BasicSSA(co2)
     
     Reconstruction
     
@@ -98,9 +101,11 @@ class BasicSsa(object):
         
     """
 
-    def __init__(self, ts, window=None, tstype=__TS_DEFAULT_TYPE__):
+    def __init__(self, ts=None, window=None, svdmethod='nplapack', tstype=__TS_DEFAULT_TYPE__):
 
-        # TODO check types
+
+
+        super(BasicSSA, self).__init__(svdmethod)
 
         self.ts = np.array(ts)
         self.tstype = tstype
@@ -131,13 +136,9 @@ class BasicSsa(object):
 
         self._matrixgrp['Original'] = self._x
 
-        # reference SVD results
-
-        self.svd = [None, None, None]
-
         # run decomposition
 
-        self._decompose()
+        #self.decompose()
 
     def __getitem__(self, item):
         # TODO : error handling
@@ -173,6 +174,7 @@ class BasicSsa(object):
     def reconstruct(self, groups=None):
 
         # TODO: DOC
+        print self._xi
 
         # Define a list of group indexes
 
@@ -319,9 +321,8 @@ class BasicSsa(object):
 
         return np.matrix(x)
 
-    def _decompose(self):
-        """Singular value decomposition           
-        """
+    """
+    def decompose(self):
 
         # rank of the trajectory matrix x
         d = self._xrank
@@ -345,6 +346,19 @@ class BasicSsa(object):
             self._xi[i] = si * ui * vi.T
 
         self.svd = [u, s, v]
+    """
+    @property
+    def _xi(self):
+        d = self._xrank
+        x = self._x
+        xi = dict()
+        u, s, v = self.svd
+        for i in range(d):
+            si = np.sqrt(s[i])  # square root of eigenvalue i
+            ui = u[:, i]  # eigenvector i corresponding to si
+            vi = x.T * ui / si
+            self._xi[i] = si * ui * vi.T
+        return xi
 
     def _getseries(self, name):
 
