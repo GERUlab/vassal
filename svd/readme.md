@@ -1,4 +1,4 @@
-# Benchmarking SVD algorithms
+# Benchmarking SSA with different SVD algorithms
 
 ## SVD algorithms
 TODOC
