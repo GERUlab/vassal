@@ -71,8 +71,9 @@ This estimator supports two algorithms: a fast randomized SVD solver, and a “n
 
 ## SVD algorithms selection
 
-The idea is to let the user choose the available implementation he wants to use:
-`nplapack`,`splapack`,`sparpack`,`skarpack` or `skrandom`.
+Both `nplapack` and `splapack` use the LAPACK algorithm for full svd decomposition but the scipy implementation allows more flexibility. Hence it is kept. The same goes with `sparpack` and `skarpack`, as `skarpack` is just a wrapper to `sparpack` with fewer arguments allowed. To my knowledge, `skrandom` has no equivalent. 
+
+Are kept: `splapack`,`sparpack` and `skrandom`.
 
 
 
