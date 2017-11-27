@@ -5,9 +5,44 @@ TODOC
 
 see: https://stats.stackexchange.com/a/159602/87558
 
-for comparison with rSSA package: https://cran.r-project.org/web/packages/Rssa/Rssa.pdf
+### Comparison with rSSA package: 
+see: https://cran.r-project.org/web/packages/Rssa/Rssa.pdf
 
-References for sklearn TruncatedSVD:   
+rSSA package uses either 'nutrlan', 'propack', 'full svd' with the dgesdd routine
+and 'eigen' as full SVD via eigendecompsition of the cross-product matrix
+
+see: https://code.lbl.gov/pipermail/trlan-users/2009-May/000007.html
+
+>Here is a little longer answer to your question on comparing ARPACK 
+with TRLan.  TRLan (and nuTRLan) implements a restarted version of 
+Lanczos algorithm, just like ARPACK implements a restarted version of 
+Arnoldi algorithm.  In this regard, the user has control over the 
+memory usage by controlling the maximum basis size.  Another 
+similarity is that both can keep an arbitrary number of basis vectors 
+when restarting -- this is the key advantage of these methods over 
+earlier restarted versions.
+
+On symmetric (or Hermitian) problems, when the basis vectors 
+corresponding to the same Ritz values are saved during restarting, 
+TRLan and ARPACK are theoretically equivalent.  One difference is that 
+TRLan uses Ritz vectors while ARPACK uses the vectors produced by the 
+implicit QR procedure.  This makes TRLan a little easier to understand 
+and implement.  This difference is mainly useful for software 
+implementors -- it is of no consequence to the end users.
+
+What do have some consequence are the following.  TRLan can take 
+advantage of the symmetry in the original problem as Ichi has pointed 
+out.  TRLan and especially nuTRLan use more advanced strategies to 
+decide what Ritz values to save during restarting.  These strategies 
+have been demonstrated to be very effective.  In general, the 
+restarted version of Lanczos would need more matrix-vector 
+multiplications than the un-restarted version.  In cases where the 
+un-restarted Lanczos can be used, TRLan was shown to use nearly the 
+same number of matrix-vector multiplications.  On more difficult 
+eigenvalue problems, TRLan usually performed better because of the new 
+restarting strategies.
+
+### References for sklearn TruncatedSVD:   
 
 * Finding structure with randomness: Stochastic algorithms for constructing
   approximate matrix decompositions
