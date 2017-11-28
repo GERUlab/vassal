@@ -3,28 +3,28 @@
 """
 import warnings
 
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
-from vassal.devutil.performance import mytimer
-from vassal.dtypes import is_1darray_like
+from vassal.dtypes import (
+    is_1darray_like,
+    is_valid_group_dict)
+
 from vassal.base import BaseSSA
+from vassal.plot import PlotSSA
 
 try:
     import pandas as pd
 
-    __TS_DEFAULT_TYPE__ = pd.Series
+    __TS_DEFAULT_TYPE__ = 'pdseries'
 except:
     warnings.warn('pandas module missing: __TS__DEFAULT_TYPE__ set to np.array')
-    __TS_DEFAULT_TYPE__ = np.array
+    __TS_DEFAULT_TYPE__ = 'nparray'
 
 
 # TODO: test behavior with np.nan in series
-# TODO: add option full_matrices
 
-
-
-class BasicSSA(BaseSSA):
+class BasicSSA(BaseSSA, PlotSSA):
     """A class for basic Singular Spectrum Analysis 
     
     Singular Spectrum Analysis (SSA) is a non-parametric method
@@ -101,105 +101,33 @@ class BasicSSA(BaseSSA):
         
     """
 
-    def __init__(self, ts=None, window=None, svdmethod='nplapack', tstype=__TS_DEFAULT_TYPE__):
+    def __init__(self, ts=None, window=None, svdmethod='nplapack',
+                 usetype=__TS_DEFAULT_TYPE__):
 
+        # we pass the svd method to the base class init in order to wrap the
+        # proper decompose method
 
-
-        super(BasicSSA, self).__init__(svdmethod)
-
-        self.ts = np.array(ts)
-        self.tstype = tstype
-        self._n = len(ts)
-
-        self._matrixgrp = dict()
+        super(BasicSSA, self).__init__(ts=ts, svdmethod=svdmethod,
+                                       usetype= usetype)
 
         # define window length if none
 
         if window is None:
-            window = self._n // 2
+            window = self._n_ts // 2
 
         self.window = window
 
         # define number of trajectory vectors
 
-        self._k = self._n - self.window + 1
-
-        # compute trajectory matrix
-
-        self._x = self._embedseries()
-
-        # set rank of trajectory matrix
-
-        self._xrank = np.linalg.matrix_rank(self._x)
-
-        # add original matrix to matrix group
-
-        self._matrixgrp['Original'] = self._x
-
-        # run decomposition
-
-        #self.decompose()
-
-    def __getitem__(self, item):
-        # TODO : error handling
-        ts = self._getseries(item)
-        return self.tstype(ts)
+        self._k = self._n_ts - self.window + 1
 
     # --------------------------------------------------------
     # Properties
 
-    @property
-    def groups(self):
-        """List of reconstructed group names
-        
-        Group names are ordered so that the first one corresponds
-        the the 'Original' time series group and the last one to
-        the 'Residuals'.
-        
-        """
-
-        groups = self._matrixgrp.keys()
-
-        if 'Original' in groups:
-
-            firstgroup = ['Original']
-            others = [n for n in groups if n != 'Original']
-            sortedgroups = firstgroup + others
-
-        return sortedgroups
 
     # --------------------------------------------------------
     # Public methods
 
-    def reconstruct(self, groups=None):
-
-        # TODO: DOC
-        print self._xi
-
-        # Define a list of group indexes
-
-        if groups is None:
-            idx_list = [range(len(self._xi))]
-            names = ['reconstruction']
-        else:
-            idx_list = [i for i in groups.values()]
-            names = [name for name in groups.keys()]
-
-        for name, idx_grp in zip(names, idx_list):
-            x_group = [self._xi[key] for key in idx_grp]
-            x_sum = np.sum(x_group, axis=0)
-
-            self._matrixgrp[name] = x_sum
-
-        all_grp_idx = [ix for sublist in idx_list for ix in sublist]
-
-        residual_idx = [ix for ix in range(len(self._xi)) if ix not in all_grp_idx]
-
-        x_res = [self._xi[ix] for ix in residual_idx]
-        x_res_sum = np.sum(x_res, axis=0)
-
-        if bool(x_res_sum.any()):
-            self._matrixgrp['Residuals'] = x_res_sum
 
     def wcorr(self, components=None):
         """Compute the weighted correlation matrix
@@ -235,7 +163,8 @@ class BasicSSA(BaseSSA):
 
         else:
 
-            raise TypeError('components should be either None, int or array-like.')
+            raise TypeError('components should be either None, int or '
+                            'array-like.')
 
         # check if components exists
 
@@ -243,7 +172,7 @@ class BasicSSA(BaseSSA):
             raise IndexError('Components are out of range.')
 
         k = self._k  # number of lagged vectors
-        n = self._n  # series length
+        n = self._n_ts  # series length
         w = self.window  # window parameter
         cn = len(comp_idx)  # number of components
 
@@ -255,7 +184,7 @@ class BasicSSA(BaseSSA):
 
         # reconstruction of selected components
 
-        tsn = np.array([self._antidiagmean(x) for x in self._xi.values()[:cn]])
+        tsn = np.array([self._hankelmatrix_to_ts(x) for x in self._xi.values()[:cn]])
 
         # diag offsets
 
@@ -311,7 +240,7 @@ class BasicSSA(BaseSSA):
 
         ts = self.ts
         w = self.window
-        n = self._n
+        n = self._n_ts
         k = self._k
 
         x = np.zeros(shape=(w, k))
@@ -321,58 +250,36 @@ class BasicSSA(BaseSSA):
 
         return np.matrix(x)
 
-    """
-    def decompose(self):
 
-        # rank of the trajectory matrix x
-        d = self._xrank
-        x = self._x
-        assert (d == min(self._x.shape))
+    def _reconstruct_group(self, idx):
 
-        # decomposition of the trajectory matrix x
-        # u and v are unitary and s is a 1-d array of d singular values.
-
-        u, s, v = np.linalg.svd(self._x, full_matrices=False)
-
-        # note: types are all np.matrix
-
-        self._xi = dict()
-
-        for i in range(d):
-            si = np.sqrt(s[i])  # square root of eigenvalue i
-            ui = u[:, i]  # eigenvector i corresponding to si
-            vi = x.T * ui / si
-
-            self._xi[i] = si * ui * vi.T
-
-        self.svd = [u, s, v]
-    """
-    @property
-    def _xi(self):
-        d = self._xrank
-        x = self._x
-        xi = dict()
         u, s, v = self.svd
-        for i in range(d):
-            si = np.sqrt(s[i])  # square root of eigenvalue i
-            ui = u[:, i]  # eigenvector i corresponding to si
-            vi = x.T * ui / si
-            self._xi[i] = si * ui * vi.T
-        return xi
 
-    def _getseries(self, name):
+        x = self._embedseries()
 
-        x = self._matrixgrp[name]
+        m, n = x.shape
+
+        x_grp = np.matrix(np.zeros(shape=(m,n)))
+
+        if isinstance(idx, int):
+            idx = [idx]
+
+        for i in idx:
+            s_i = np.sqrt(s[i]) # TODO: check if I really need to do the square root !!
+            u_i = u[:, i]  # eigenvector i corresponding to si
+            v_i = x.T * u_i / s_i
+            x_i = s_i * u_i * v_i.T
+            x_grp += x_i
 
         # anti diagonal averaging
 
-        ts = self._antidiagmean(x)
+        ts = self._hankelmatrix_to_ts(x_grp)
 
         return ts
 
     @staticmethod
-    def _antidiagmean(x):
-        """Average the antidiagonal of matrix
+    def _hankelmatrix_to_ts(x):
+        """Average the antidiagonal of Hankel matrix to return 1d time series
         
         Parameters
         ----------
@@ -389,188 +296,9 @@ class BasicSSA(BaseSSA):
 
         return np.array(ts)
 
-    # --------------------------------------------------------
-    # Plotting methods
 
-    def plot(self, pltname='values', show=True, **pltkw):
-
-        if pltname not in self._plotnames:
-            names = ','.join(self._plotnames)
-            raise AttributeError('Unknown plot name \'{}\'. Name should be on of {}.'.format(pltname, names))
-
-        elif pltname == 'values':
-            fig, ax = self._value_plot(**pltkw)
-
-        elif pltname == 'reconstruction':
-            fig, ax = self._reconstruction_plot(**pltkw)
-
-        elif pltname == 'wcorr':
-            fig, ax = self._wcorr_plot(**pltkw)
-
-        elif pltname == 'vectors':
-            fig, ax = self._vectors_plot(**pltkw)
-
-        elif pltname == 'paired':
-            fig, ax = self._paired_plot(**pltkw)
-
-        else:
-            raise NotImplementedError('{} not implemented'.format(pltname))
-
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-
-        if show is True:
-            plt.show()
-
-        return fig, ax
-
-    @property
-    def _plotnames(self):
-        names = [
-            'values',
-            'reconstruction',
-            'wcorr',
-            'vectors',
-            'paired'
-        ]
-        return names
-
-    def _value_plot(self, n=50, **pltkw):
-
-        # eigenvalues
-        eigenvalues = self.svd[1] # TODO: check if needed to raise power
-
-        #
-        fig = plt.figure()
-        ax = fig.gca()
-        ax.semilogy(eigenvalues[:n], '-ok', markersize=4., alpha=0.5)
-        ax.set_ylabel('Component Norms')
-        ax.set_xlabel('Index')
-
-        return fig, ax
-
-    def _reconstruction_plot(self, **pltkw):
-
-        groups = self.groups
-
-        if len(groups) > 1:
-
-            fig, axarr = plt.subplots(len(groups), 1, sharex=True)
-
-            for i, g in enumerate(groups):
-                ts = self._getseries(g)
-                axarr[i].plot(ts, **pltkw)
-                axarr[i].set_title(g)
-                if i == len(groups) - 1:
-                    axarr[i].set_xlabel('Time')
-        else:
-            pass
-
-        return fig, axarr
-
-    def _wcorr_plot(self, n=20, *args, **kwargs):
-
-        wcorr = self.wcorr(components=n)
-
-        fig = plt.figure()
-        ax = fig.gca()
-        im = ax.pcolor(wcorr, vmin=-1, vmax=1, cmap='PiYG')
-        ax.set_aspect('equal')
-
-        # set ticks
-
-        ticks = np.arange(wcorr.shape[0])
-        ax.set_xticks(ticks + 0.5, minor=False)
-        ax.set_yticks(ticks + 0.5, minor=False)
-
-        ax.set_xticklabels(int(x) for x in ticks)
-        ax.set_yticklabels(int(x) for x in ticks)
-
-        ax.set_title('w-correlation matrix')
-
-        fig.colorbar(im)
-
-        return fig, ax
-
-    def _vectors_plot(self, n = 10, **pltkw):
-        """
-        The rows of v are the eigenvectors of a.H a. The columns of u are the 
-        eigenvectors of a a.H. For row i in v and column i in u, the 
-        corresponding eigenvalue is s[i]**2.
-        
-        Parameters
-        ----------
-        n
-
-        Returns
-        -------
-
-        """
-        # TODO: type error
-        u = self.svd[0]
-        s = self.svd[1]**2 # TODO: check if power is needed
-
-        fig = plt.figure()
-
-        # grid size
-
-        m = int(np.ceil(np.sqrt(n)))
-
-        ax = None
-
-        for i in range(n):
-            ax = plt.subplot(m, m, i+1, sharey=ax)
-            ax.plot(u[:,i], **pltkw)
-            ax.set_xticks([])
-            ax.set_yticks([])
-
-            contribution =  s[i]/np.sum(s)*100
-
-            title = 'EV{0} ({1:.0f} %)'.format(i+1, contribution)
-
-            ax.set_title(title, {'fontsize':10.})
-
-        fig.suptitle('Eigenvectors plot')
-
-        return fig, fig.get_axes()
-
-    def _paired_plot(self, pairs=zip(range(0,9),range(1,10)), **pltkw):
-
-        # TODO: check type pairs list of tuple of size 2
-
-        print pairs
-        u = self.svd[0]
-        s = self.svd[1]**2 # TODO: check if power is needed
-
-        fig = plt.figure()
-
-        m = int(np.ceil(np.sqrt(len(pairs))))
-
-        ax = None
-
-        for i, j in pairs:
-            ax = plt.subplot(m, m, i+1, sharey=ax)
-            ax.plot(u[:,j], u[:,i], **pltkw)
-            ax.set_xticks([])
-            ax.set_yticks([])
-            ax.set_aspect('equal')
-
-            ssum = np.sum(s)
-
-            contribution1 =  s[i]/ssum*100
-            contribution2 =  s[j]/ssum*100
-
-            title = 'EV{0} ({1:.0f}%) vs EV{2} ({3:.0f}%)'.format(
-                i+1,
-                contribution1,
-                i+2,
-                contribution2
-            )
-
-            ax.set_title(title, {'fontsize':10.})
-
-            fig.suptitle('Pairs of eigenvectors')
-
-        return fig, fig.get_axes()
+class ToeplitzSSA(BaseSSA):
+    pass
 
 
 
