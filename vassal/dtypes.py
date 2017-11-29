@@ -4,6 +4,7 @@
 import numpy as np
 import pandas as pd
 
+
 # -------------------------------------------------------------------------------
 # Type checker
 
@@ -179,7 +180,7 @@ def arraylike_to_nparray(arraylike):
 
     assert (is_1darray_like(arraylike))
 
-    # The only problem comes with dictionnaries. Dict values sould be passed to
+    # The only problem comes with dictionaries. Dict values should be passed to
     # np.array.
 
     if isinstance(arraylike, dict):
@@ -191,6 +192,7 @@ def arraylike_to_nparray(arraylike):
         nparr = np.array(arraylike, dtype=None)
 
     return nparr
+
 
 def nested2d_to_flatlist(nestedlist):
     """Returns a flat list from a nested 2d list regardless item is iterable
@@ -215,7 +217,7 @@ def nested2d_to_flatlist(nestedlist):
     return flatlist
 
 
-
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod()

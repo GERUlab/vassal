@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to vassal’s documentation! &mdash; vassal 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="vassal 0.0.1 documentation" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> vassal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to vassal’s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">vassal</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Welcome to vassal’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-vassal-s-documentation">
+<h1>Welcome to vassal’s documentation!<a class="headerlink" href="#welcome-to-vassal-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-vassal.ssa"></span><p>Singular Spectrum Analysis Class</p>
+<dl class="class">
+<dt id="vassal.ssa.BasicSSA">
+<em class="property">class </em><code class="descclassname">vassal.ssa.</code><code class="descname">BasicSSA</code><span class="sig-paren">(</span><em>ts=None</em>, <em>window=None</em>, <em>svdmethod='nplapack'</em>, <em>usetype='pdseries'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vassal/ssa.html#BasicSSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vassal.ssa.BasicSSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for basic Singular Spectrum Analysis</p>
+<dl class="method">
+<dt id="vassal.ssa.BasicSSA.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>ts=None</em>, <em>window=None</em>, <em>svdmethod='nplapack'</em>, <em>usetype='pdseries'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vassal/ssa.html#BasicSSA.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vassal.ssa.BasicSSA.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic Singular Spectrum Analysis</p>
+<p>Basic Singular Spectrum Analysis embed the times series into an Hankel
+matrix (i.e. anti-diagonal elements are all equal). For a time series
+<span class="math">\(Y =\{y_1, y_2, ..., y_N\}\)</span> of length <span class="math">\(N\)</span>,
+<span class="math">\(Y\)</span> is embedded with respect to the window parameter <span class="math">\(L\)</span>
+into a matrix <span class="math">\(X\)</span> of shape <span class="math">\((L,K)\)</span>:</p>
+<div class="math">
+\[\begin{split}X= \begin{bmatrix}
+        y_1     &amp; y_2     &amp; y_3     &amp; \dots   &amp; y_K      \\
+        y_2     &amp; y_3     &amp; y_4     &amp; \dots   &amp; y_{K+1}  \\
+        y_3     &amp; y_4     &amp; y_5     &amp; \dots   &amp; y_{K+2}  \\
+        \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots   \\
+        y_L     &amp; y_{L+1} &amp; y_{L+2} &amp; \dots   &amp; y_N
+    \end{bmatrix}\end{split}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ts</strong> (<em>arraylike</em>) – One dimensional array-like object (np.array, dict, list, pd.Series)
+holding the time series values. If ts is as pandas.Series object and
+if svdmethod is set to ‘pdseries’ index is kept and pass the the
+results of SSA.</li>
+<li><strong>window</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optionnal</em>) – The window parameter of basic SSA.</li>
+<li><strong>svdmethod</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optionnal</em>) – Lorem Ipsum.</li>
+<li><strong>usetype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optionnal</em>) – Lorem Ipsums</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<ul class="simple">
+<li>Decomposition</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">float_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:,.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myssa</span> <span class="o">=</span> <span class="n">BasicSSA</span><span class="p">(</span><span class="n">ts</span><span class="o">=</span><span class="n">timeseries</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">myssa</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Print the 3 first singular values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">s</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+<span class="go">[ 220.04832942   42.43314868   42.11375246]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Grouping</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;trend&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;signal&#39;</span><span class="p">:</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myssa</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myssa</span><span class="p">[</span><span class="s1">&#39;trend&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="go">count   100.00</span>
+<span class="go">mean      4.35</span>
+<span class="go">std       0.09</span>
+<span class="go">min       4.09</span>
+<span class="go">25%       4.32</span>
+<span class="go">50%       4.36</span>
+<span class="go">75%       4.40</span>
+<span class="go">max       4.51</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myssa</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="go">       trend  signal  ssa_original  ssa_reconstruction  ssa_residuals</span>
+<span class="go">count 100.00  100.00        100.00              100.00         100.00</span>
+<span class="go">mean    4.35   -0.08          4.33                4.33           0.05</span>
+<span class="go">std     0.09    2.03          2.82                2.82           1.83</span>
+<span class="go">min     4.09   -4.80          0.00                0.00          -5.00</span>
+<span class="go">25%     4.32   -1.49          2.00                2.00          -1.16</span>
+<span class="go">50%     4.36   -0.10          4.00                4.00           0.10</span>
+<span class="go">75%     4.40    1.47          7.00                7.00           1.17</span>
+<span class="go">max     4.51    4.64          9.00                9.00           4.31</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="vassal.ssa.BasicSSA._embedseries">
+<code class="descname">_embedseries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vassal/ssa.html#BasicSSA._embedseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vassal.ssa.BasicSSA._embedseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Embed a time series into a L-trajectory matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong> – the trajectory matrix of size (window, k)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="vassal.ssa.BasicSSA._hankelmatrix_to_ts">
+<em class="property">static </em><code class="descname">_hankelmatrix_to_ts</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vassal/ssa.html#BasicSSA._hankelmatrix_to_ts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vassal.ssa.BasicSSA._hankelmatrix_to_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average the antidiagonal of Hankel matrix to return 1d time series</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>np.matrix</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>timeseries</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Damien Delforge.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

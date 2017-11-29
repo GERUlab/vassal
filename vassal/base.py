@@ -21,7 +21,7 @@ from dtypes import (
     arraylike_to_nparray)
 
 
-class BadCallError(ValueError):
+class ResolutionOrderError(ValueError):
     """Raised when a method is called before a dependent method."""
     pass
 
@@ -57,10 +57,7 @@ class BaseSSA(object):
         self._tsname = None  # pandas series name
         self._usergroups = None  # user defined groups for reconstruction
 
-        self._grpmatrixdict = None  # dictionary to store reconstructed matrix
-
-        ## reference singular value decomposition results
-
+        # reference singular value decomposition results
         # 0: Unitary matrix having left singular vectors as columns
         # 1: Singular values
         # 2: Unitary matrix having right singular vectors as rows
@@ -105,15 +102,12 @@ class BaseSSA(object):
 
     def __getitem__(self, item):
 
-        grpkeys = self.groups.keys()
-
         if not isinstance(item, str):
-
             raise TypeError('Item index should be type str.')
 
         if item in self._usergroups.keys():
-
-            ts = self._getseries(item)
+            grpidx = self.groups[item]
+            ts = self._reconstruct_group(grpidx)
 
         elif item == 'ssa_original':
 
@@ -279,10 +273,14 @@ class BaseSSA(object):
 
         """
 
-        # check if self.decompose was done
+        # Retrieve the number of components
 
-        if any(item is None for item in self.svd):
-            raise BadCallError('reconstruct method cannot be called before '
+        n = self._n_components
+
+        # check if self.decompose was done (ie if n is defined)
+
+        if not n:
+            raise ResolutionOrderError('reconstruct method cannot be called before '
                                'decompose method.')
 
         # check groups
@@ -297,10 +295,13 @@ class BaseSSA(object):
                 'Invalid group dict. Keys should be type str and values type '
                 'int or list of int.')
 
-        # check indexes
-        # TODO
+        # check group indexes for index errors
 
+        flat_grpidx = nested2d_to_flatlist(groups.values())
 
+        if not all([i < n for i in flat_grpidx]):
+            raise IndexError('Group indexes cannot exceed the highest '
+                             'component index {}.'.format(n - 1))
 
         # save usergroups if not defined or if append is False
 
@@ -331,19 +332,16 @@ class BaseSSA(object):
                 for key, values in newgrp:
                     self._usergroups[key] = values
 
+    def to_frame(self):
+        """Return DataFrame with all signals"""
+        # TODO: np.array equivalent
+        df = pd.DataFrame()
+        for name in self.groups.keys():
+            df[name] = self.__getitem__(name)
+        return df
+
     # --------------------------------------------------------------------------
     # Private methods
-
-    def _getseries(self, grpkey):
-        """Get reconstructed series from grpkey"""
-
-        # retrieve component as 1d np.array
-
-        grpidx = self.groups[grpkey]
-
-        ts = self._reconstruct_group(grpidx)
-
-        return self._format_output_ts(ts)
 
     def _format_output_ts(self, ts):
 
@@ -353,6 +351,113 @@ class BaseSSA(object):
             ts = pd.Series(ts, name=self._tsname, index=self._tsindex)
 
         return ts
+
+    def wcorr(self, components=None):
+        """Compute the weighted correlation matrix
+
+        See equation in ref [1], paragraph separability
+
+        Returns
+        -------
+
+        References
+        ----------
+
+        [1] Hassani, Hossein. "Singular Spectrum Analysis: Methodology and Comparison."
+        MPRA Paper, April 1, 2007. https://mpra.ub.uni-muenchen.de/4991/.
+
+
+        """
+
+        # retrieve the number of components
+
+        ncp = self._n_components
+
+        # check for components type
+
+        if isinstance(components, int):
+
+            comp_idx = range(components)
+
+        elif is_1darray_like(components):
+
+            comp_idx = components
+
+        elif components is None:
+
+            comp_idx = range(ncp)
+
+        else:
+
+            raise TypeError('components should be either None, int or '
+                            'array-like.')
+
+        # check if components exists
+
+        if not set(comp_idx).issubset(range(ncp)):
+            raise IndexError('Components are out of range.')
+
+        # retrieve the maximum number of components
+
+        ncp_max = len(comp_idx)
+
+        # get the original matrix
+
+        x = self._embedseries()
+        row, col = x.shape
+
+        # series length
+
+        nts = self._n_ts
+
+        w_k = min((col, row, nts - col)) * np.ones(nts)
+
+        # intialize w-corr upper right matrix
+
+        wcorr_ur = np.zeros(shape=(ncp_max, ncp_max))
+
+        # reconstruction of selected components
+
+        tsn = np.array([self._reconstruct_group(i) for i in range(ncp_max)])
+
+        # diag offsets
+
+        offsets = range(ncp_max)
+
+        # we compute wcorr using an indices based lagged convolution
+        # doing so we compute the upper right correlation matrix
+        # then we perform the symmetry
+
+        for offset in offsets:
+            lagged_tsn = np.array([tsn[offset:, :], tsn[:ncp_max - offset, :]])
+
+            # weighted sum for components i j lagged by offset
+            # see reference for equation
+
+            wsum_ij = np.sum(w_k * np.product(lagged_tsn, axis=0), axis=1)
+            sqrtwsum_i = np.sqrt(np.sum(w_k * lagged_tsn[0] ** 2, axis=1))
+            sqrtwsum_j = np.sqrt(np.sum(w_k * lagged_tsn[1] ** 2, axis=1))
+
+            rho = wsum_ij / (sqrtwsum_i * sqrtwsum_j)
+
+            # wcorr offset diagonal axis 0 coordinate
+
+            drng = np.array(offsets[:len(rho)])
+            wcorr_ur[drng, drng + offset] = rho
+
+        # get lower left symmetry
+
+        wcorr_ll = wcorr_ur.T.copy()
+
+        # remove diagonal values of lower left triangular matrix
+
+        np.fill_diagonal(wcorr_ll, 0.)
+
+        # restore symmetry by addition of upperright and lower left
+
+        wcorr = wcorr_ur + wcorr_ll
+
+        return wcorr
 
     # --------------------------------------------------------------------------
     # Wrappers to SVD solvers
@@ -554,31 +659,3 @@ class BaseSSA(object):
         self.svd = [np.matrix(u), s, np.matrix(v)]
 
         return self.svd
-
-
-if __name__ == '__main__':
-    from vassal.ssa import BasicSSA
-    import numpy as np
-
-    np.random.seed(0)
-    s = np.random.randint(low=0, high=10, size=200)
-
-    npssa = BasicSSA(s, svdmethod='nplapack')
-    spssa = BasicSSA(s, svdmethod='splapack')
-    sp2ssa = BasicSSA(s, svdmethod='sparpack')
-    skssa = BasicSSA(s, svdmethod='skrandom')
-    u1, s1, v1 = npssa.decompose()
-    u2, s2, v2 = spssa.decompose()
-    u3, s3, v3 = sp2ssa.decompose()
-    u4, s4, v4 = skssa.decompose()
-    print np.allclose(s1, s2)
-    print np.allclose(s2[:-1], s3)
-    print np.allclose(s3, s4)
-
-    groups = {
-        'trend': 0,
-        'season': [1, 2]
-    }
-    npssa.reconstruct(groups)
-    print npssa['trend'].describe()
-    print npssa['season'].describe()
