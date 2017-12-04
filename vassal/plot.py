@@ -6,11 +6,11 @@ import abc
 import numpy as np
 import matplotlib.pyplot as plt
 
-class PlotSSA(object):
 
+class PlotSSA(object):
     __metaclass__ = abc.ABCMeta
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Abstract methods
 
 
@@ -18,7 +18,7 @@ class PlotSSA(object):
     # --------------------------------------------------------------------------
     # Plotting methods
 
-    def plot(self, pltname='values', show=True, **pltkw):
+    def plot(self, pltname='values', ax=None, show=False, **pltkw):
 
         if pltname not in self._plotnames:
             names = ','.join(self._plotnames)
@@ -27,13 +27,13 @@ class PlotSSA(object):
                     pltname, names))
 
         elif pltname == 'values':
-            fig, ax = self._value_plot(**pltkw)
+            fig, ax = self._value_plot(ax=ax, **pltkw)
 
         elif pltname == 'reconstruction':
             fig, ax = self._reconstruction_plot(**pltkw)
 
         elif pltname == 'wcorr':
-            fig, ax = self._wcorr_plot(**pltkw)
+            fig, ax = self._wcorr_plot(ax=ax, **pltkw)
 
         elif pltname == 'vectors':
             fig, ax = self._vectors_plot(**pltkw)
@@ -62,17 +62,20 @@ class PlotSSA(object):
         ]
         return names
 
-    def _value_plot(self, n=50, **pltkw):
+    def _value_plot(self, n=50, ax=None, **pltkw):
 
         # eigenvalues
         eigenvalues = self.svd[1]  # TODO: check if needed to raise power
 
-        #
-        fig = plt.figure()
-        ax = fig.gca()
-        ax.semilogy(eigenvalues[:n], '-ok', markersize=4., alpha=0.5)
+        if not ax:
+            fig = plt.figure()
+            ax = fig.gca()
+
+        ax.semilogy(eigenvalues[:n], **pltkw)
         ax.set_ylabel('Component Norms')
         ax.set_xlabel('Index')
+
+        fig = ax.get_figure()
 
         return fig, ax
 
@@ -85,7 +88,8 @@ class PlotSSA(object):
             fig, axarr = plt.subplots(len(groups), 1, sharex=True)
 
             for i, g in enumerate(groups):
-                ts = self._getseries(g)
+                data = self.to_frame()
+                ts = data[g]
                 axarr[i].plot(ts, **pltkw)
                 axarr[i].set_title(g)
                 if i == len(groups) - 1:
@@ -95,12 +99,16 @@ class PlotSSA(object):
 
         return fig, axarr
 
-    def _wcorr_plot(self, n=20, *args, **kwargs):
+    def _wcorr_plot(self, n=20, ax=None, *args, **kwargs):
 
         wcorr = self.wcorr(components=n)
 
-        fig = plt.figure()
-        ax = fig.gca()
+        if not ax:
+            fig = plt.figure()
+            ax = fig.gca()
+        else:
+            fig = ax.get_figure()
+
         im = ax.pcolor(wcorr, vmin=-1, vmax=1, cmap='PiYG')
         ax.set_aspect('equal')
 
@@ -119,7 +127,7 @@ class PlotSSA(object):
 
         return fig, ax
 
-    def _vectors_plot(self, n=10, **pltkw):
+    def _vectors_plot(self, n=10, ax=None, **pltkw):
         """
         The rows of v are the eigenvectors of a.H a. The columns of u are the 
         eigenvectors of a a.H. For row i in v and column i in u, the 
@@ -153,7 +161,7 @@ class PlotSSA(object):
 
             contribution = s[i] / np.sum(s) * 100
 
-            title = 'EV{0} ({1:.0f} %)'.format(i + 1, contribution)
+            title = 'EV{0} ({1:.0f} %)'.format(i, contribution)
 
             ax.set_title(title, {'fontsize': 10.})
 
@@ -188,14 +196,14 @@ class PlotSSA(object):
             contribution2 = s[j] / ssum * 100
 
             title = 'EV{0} ({1:.0f}%) vs EV{2} ({3:.0f}%)'.format(
-                i + 1,
+                i,
                 contribution1,
-                i + 2,
+                i + 1,
                 contribution2
             )
 
             ax.set_title(title, {'fontsize': 10.})
 
-            fig.suptitle('Pairs of eigenvectors')
+            fig.suptitle('Pairs of eigenvectors') #TODO : not printed in my notebook
 
         return fig, fig.get_axes()
