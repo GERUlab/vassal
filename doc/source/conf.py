@@ -18,7 +18,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('C:/Users/dadelforge/Google Drive/MIGRADAKH/07_labo_numerique/modules/vissa/'))
+sys.path.insert(0, os.path.abspath('C:/Users/dadelforge/Google Drive/MIGRADAKH/07_labo_numerique/modules/vassal/'))
 
 
 # -- General configuration ------------------------------------------------
