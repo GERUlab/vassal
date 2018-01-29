@@ -2,9 +2,9 @@
 
 UNDER DEVELOPMENT
 
-author: Damien Delforge
+Author: Damien Delforge
 
-email: damien.delforge@uclouvain.be
+Email: damien.delforge@uclouvain.be
 
 
 ## Introduction
