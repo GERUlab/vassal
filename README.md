@@ -1,7 +1,9 @@
 # VASSAL: VArious Singular Spectrum AnaLysis with python
 
 UNDER DEVELOPMENT
+
 author: Damien Delforge
+
 email: damien.delforge@uclouvain.be
 
 
