@@ -12,6 +12,7 @@ Email: damien.delforge@uclouvain.be
 * Computing the weighted correlation matrix is too long for large time series
 * Reconstructing series is too long for long time series
 * Make 'paired' plot able to plot any pair, not just consecutive one
+* Implement Toeplitz SSA
 * Add a method for change point analysis that uses Singular Spectrum Transansformation (SST)
 
 ## Introduction
@@ -114,13 +115,6 @@ This estimator supports two algorithms: a fast randomized SVD solver, and a “n
 Both `nplapack` and `splapack` use the LAPACK algorithm for full svd decomposition but the scipy implementation allows more flexibility. Hence it is kept. The same goes with `sparpack` and `skarpack`, as `skarpack` is just a wrapper to `sparpack` with fewer arguments allowed. To my knowledge, `skrandom` has no equivalent. 
 
 Are kept: `splapack`,`sparpack` and `skrandom`.
-
-
-
-
-
-
-
 
 ## Acknowledgment
 
