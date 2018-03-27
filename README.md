@@ -12,6 +12,7 @@ Email: damien.delforge@uclouvain.be
 * Computing the weighted correlation matrix is too long for large time series
 * Reconstructing series is too long for long time series
 * Make 'paired' plot able to plot any pair, not just consecutive one
+* Add a method for change point analysis that uses Singular Spectrum Transansformation (SST)
 
 ## Introduction
 
