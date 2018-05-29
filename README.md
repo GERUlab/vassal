@@ -13,6 +13,7 @@ Email: damien.delforge@uclouvain.be
 * Reconstructing series is too long for long time series
 * Make 'paired' plot able to plot any pair, not just consecutive one
 * Implement Toeplitz SSA
+* Add a decimal in the characteristic contribution
 * Add a method for change point analysis that uses Singular Spectrum Transansformation (SST)
 
 ## Introduction
